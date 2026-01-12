@@ -37,7 +37,8 @@ export function createClient() {
                     if (missing.length > 0) {
                         msg = `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`;
                     } else {
-                        msg = `URL no válida. Detectado: "${url?.substring(0, 30)}${url?.length > 30 ? '...' : ''}". Debe empezar con http.`;
+                        const urlStr = url || "";
+                        msg = `URL no válida. Detectado: "${urlStr.substring(0, 30)}${urlStr.length > 30 ? '...' : ''}". Debe empezar con http.`;
                     }
                     return Promise.resolve({ data: {}, error: { message: msg } });
                 },
