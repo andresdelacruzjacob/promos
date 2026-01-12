@@ -13,26 +13,32 @@ export function createClient() {
     const isInvalid = !isValidUrl || !key || url === 'undefined' || key === 'undefined';
 
     if (isInvalid) {
-        if (typeof window === 'undefined') {
-            console.warn("Supabase env variables are missing or invalid during build. Using dummy client.");
-            // Return a safe dummy object that won't crash when methods are called
-            const mock = {
-                from: () => ({
-                    select: () => ({
-                        order: () => Promise.resolve({ data: [], error: null }),
-                        eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }),
-                        contains: () => ({ order: () => Promise.resolve({ data: [], error: null }) })
-                    }),
-                    delete: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
+        const errorMessage = `Invalid or missing Supabase configuration. URL: ${url}. Check Vercel Environment Variables.`;
+
+        // Always provide a mock to prevent crashes, both in build and browser
+        const mock = {
+            from: () => ({
+                select: () => ({
+                    order: () => Promise.resolve({ data: [], error: null }),
+                    eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }),
+                    contains: () => ({ order: () => Promise.resolve({ data: [], error: null }) })
                 }),
-                auth: {
-                    getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-                    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-                }
-            };
-            return mock as any;
+                delete: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
+            }),
+            auth: {
+                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+                signOut: () => Promise.resolve({ error: null }),
+            }
+        };
+
+        if (typeof window === 'undefined') {
+            console.warn(errorMessage + " Using dummy client.");
+        } else {
+            console.error(errorMessage);
         }
-        throw new Error(`Invalid or missing Supabase configuration. URL: ${url}`);
+
+        return mock as any;
     }
 
     return createBrowserClient(url!, key!);
