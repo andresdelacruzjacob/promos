@@ -1,45 +1,22 @@
 import { createBrowserClient } from '@supabase/ssr'
 
+// DEFINITIVE FALLBACKS - Since Vercel is having sync issues
+const FALLBACK_URL = "https://ldbpsglzxjdnjrlbxmbf.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYnBzZ2x6eGpkbmpybGJ4mbfIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNDk3MjYsImV4cCI6MjA4MzgyNTcyNn0.Keh6XCGf8sCIhe7mXO2hNj31TXVxqHqRvP-ng0lOwUI";
+
 export function createClient() {
-    const buildId = "BUILD_JAN_12_1745"; // ID actualizado
+    const buildId = "FIX_HARDCODED_KEYS_1800";
+
+    // Attempt to get from env first
     let url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
     let key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
-    // Limpieza de pegado
-    if (url?.includes('=')) url = url.split('=').pop()?.trim();
-    if (key?.includes('=')) key = key.split('=').pop()?.trim();
+    // If env is missing, malformed (missing 'h'), or points to old project 'iwmmtoxe'
+    const isOldOrBroken = !url || !url.startsWith('http') || url.includes('iwmmtoxe');
 
-    const isValidUrl = url && url.startsWith('http');
-    const isInvalid = !isValidUrl || !key || url === 'undefined' || key === 'undefined';
-
-    if (isInvalid) {
-        const urlStr = url || "VACÍO";
-
-        const mock = {
-            from: () => ({
-                select: () => ({
-                    order: () => Promise.resolve({ data: [], error: null }),
-                    eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }),
-                    contains: () => ({ order: () => Promise.resolve({ data: [], error: null }) })
-                }),
-                delete: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
-            }),
-            auth: {
-                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-                signInWithPassword: () => {
-                    const msg = `[ID:${buildId}] URL Detectada: "${urlStr.substring(0, 10)}...${urlStr.substring(urlStr.length - 5)}". Revisa el error ROJO en el panel de Vercel y dale a SAVE.`;
-                    return Promise.resolve({ data: {}, error: { message: msg } });
-                },
-                signOut: () => Promise.resolve({ error: null }),
-            }
-        };
-
-        if (typeof window === 'undefined') {
-            console.warn(`[${buildId}] Configuración inválida en Build time.`);
-        }
-
-        return mock as any;
+    if (isOldOrBroken) {
+        url = FALLBACK_URL;
+        key = FALLBACK_KEY;
     }
 
     return createBrowserClient(url!, key!);
