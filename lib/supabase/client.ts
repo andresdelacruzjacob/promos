@@ -1,21 +1,20 @@
 import { createBrowserClient } from '@supabase/ssr'
-// Forcing new build to refresh env variables
 
 export function createClient() {
+    const buildId = "BUILD_JAN_12_1739"; // ID para confirmar que vemos el último despliegue
     let url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
     let key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
-    // Clean up common copy-paste mistakes (like NEXT_PUBLIC_...=https://...)
+    // Limpieza de pegado
     if (url?.includes('=')) url = url.split('=').pop()?.trim();
     if (key?.includes('=')) key = key.split('=').pop()?.trim();
 
-    // Check if URL is actually a URL
     const isValidUrl = url && url.startsWith('http');
     const isInvalid = !isValidUrl || !key || url === 'undefined' || key === 'undefined';
 
     if (isInvalid) {
-        const errorMessage = `Supabase configuration invalid. URL: ${url}.`;
-        const urlStr = url || "";
+        const urlStr = url || "VACÍO";
+        const keyStr = key || "VACÍO";
 
         const mock = {
             from: () => ({
@@ -30,21 +29,7 @@ export function createClient() {
                 getSession: () => Promise.resolve({ data: { session: null }, error: null }),
                 onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
                 signInWithPassword: () => {
-                    let missing = [];
-                    if (!url) missing.push("URL");
-                    if (!key) missing.push("Anon Key");
-                    if (url === 'undefined') missing.push("URL (es 'undefined')");
-
-                    let msg = "";
-                    if (missing.length > 0) {
-                        msg = `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`;
-                    } else if (urlStr.includes("iwmmtoxe")) {
-                        msg = "¡Vercel sigue usando el proyecto VIEJO (iwmmtoxe)! Borra las variables en Vercel, dale a SAVE, agrégalas con 'https://ldbpsg...' y haz Redeploy.";
-                    } else {
-                        const start = urlStr.substring(0, 15);
-                        const end = urlStr.substring(urlStr.length - 10);
-                        msg = `URL no válida o antigua. Detectado: "${start}...${end}". Asegúrate de que empiece con https://`;
-                    }
+                    const msg = `[ID:${buildId}] URL Detectada: "${urlStr.substring(0, 10)}...${urlStr.substring(urlStr.length - 5)}". Proyecto ldbpsg esperado. Revisa Vercel Settings y dale a SAVE al final.`;
                     return Promise.resolve({ data: {}, error: { message: msg } });
                 },
                 signOut: () => Promise.resolve({ error: null }),
@@ -52,9 +37,7 @@ export function createClient() {
         };
 
         if (typeof window === 'undefined') {
-            console.warn(errorMessage + " Using dummy client.");
-        } else {
-            console.error(errorMessage);
+            console.warn(`[${buildId}] Configuración inválida en Build time.`);
         }
 
         return mock as any;
