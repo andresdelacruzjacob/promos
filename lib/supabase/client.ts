@@ -32,9 +32,13 @@ export function createClient() {
                     if (!url) missing.push("URL");
                     if (!key) missing.push("Anon Key");
                     if (url === 'undefined') missing.push("URL (es 'undefined')");
-                    const msg = missing.length > 0
-                        ? `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`
-                        : "URL no válida (debe empezar con http).";
+
+                    let msg = "";
+                    if (missing.length > 0) {
+                        msg = `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`;
+                    } else {
+                        msg = `URL no válida. Detectado: "${url?.substring(0, 30)}${url?.length > 30 ? '...' : ''}". Debe empezar con http.`;
+                    }
                     return Promise.resolve({ data: {}, error: { message: msg } });
                 },
                 signOut: () => Promise.resolve({ error: null }),
