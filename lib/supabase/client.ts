@@ -37,11 +37,12 @@ export function createClient() {
                     let msg = "";
                     if (missing.length > 0) {
                         msg = `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`;
+                    } else if (urlStr.includes("iwmmtoxe")) {
+                        msg = "¡Vercel sigue usando el proyecto VIEJO (iwmmtoxe)! Borra las variables en Vercel, dale a SAVE, agrégalas con 'https://ldbpsg...' y haz Redeploy.";
                     } else {
-                        const urlStr = url || "";
                         const start = urlStr.substring(0, 15);
                         const end = urlStr.substring(urlStr.length - 10);
-                        msg = `URL no válida. Detectado: "${start}...${end}". Debe empezar con http y ser la nueva de Supabase.`;
+                        msg = `URL no válida o antigua. Detectado: "${start}...${end}". Asegúrate de que empiece con https://`;
                     }
                     return Promise.resolve({ data: {}, error: { message: msg } });
                 },
