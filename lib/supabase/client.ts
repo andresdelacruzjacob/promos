@@ -15,6 +15,7 @@ export function createClient() {
 
     if (isInvalid) {
         const errorMessage = `Supabase configuration invalid. URL: ${url}.`;
+        const urlStr = url || "";
 
         const mock = {
             from: () => ({
