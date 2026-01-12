@@ -28,6 +28,7 @@ export function createClient() {
             auth: {
                 getSession: () => Promise.resolve({ data: { session: null }, error: null }),
                 onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+                signInWithPassword: () => Promise.resolve({ data: {}, error: { message: "Configuración incompleta: Revisa las variables NEXT_PUBLIC_ en Vercel." } }),
                 signOut: () => Promise.resolve({ error: null }),
             }
         };
