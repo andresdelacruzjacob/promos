@@ -1,7 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
-    const buildId = "BUILD_JAN_12_1739"; // ID para confirmar que vemos el último despliegue
+    const buildId = "BUILD_JAN_12_1745"; // ID actualizado
     let url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
     let key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
@@ -14,7 +14,6 @@ export function createClient() {
 
     if (isInvalid) {
         const urlStr = url || "VACÍO";
-        const keyStr = key || "VACÍO";
 
         const mock = {
             from: () => ({
@@ -29,7 +28,7 @@ export function createClient() {
                 getSession: () => Promise.resolve({ data: { session: null }, error: null }),
                 onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
                 signInWithPassword: () => {
-                    const msg = `[ID:${buildId}] URL Detectada: "${urlStr.substring(0, 10)}...${urlStr.substring(urlStr.length - 5)}". Proyecto ldbpsg esperado. Revisa Vercel Settings y dale a SAVE al final.`;
+                    const msg = `[ID:${buildId}] URL Detectada: "${urlStr.substring(0, 10)}...${urlStr.substring(urlStr.length - 5)}". Revisa el error ROJO en el panel de Vercel y dale a SAVE.`;
                     return Promise.resolve({ data: {}, error: { message: msg } });
                 },
                 signOut: () => Promise.resolve({ error: null }),
