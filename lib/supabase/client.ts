@@ -25,22 +25,28 @@ export function createClient() {
                 }),
                 delete: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
             }),
-            auth: {
-                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-                signInWithPassword: () => Promise.resolve({ data: {}, error: { message: "Configuración incompleta: Revisa las variables NEXT_PUBLIC_ en Vercel." } }),
-                signOut: () => Promise.resolve({ error: null }),
-            }
-        };
-
-        if (typeof window === 'undefined') {
-            console.warn(errorMessage + " Using dummy client.");
-        } else {
-            console.error(errorMessage);
+            signInWithPassword: () => {
+                let missing = [];
+                if (!url) missing.push("URL");
+                if (!key) missing.push("Anon Key");
+                if (url === 'undefined') missing.push("URL (es 'undefined')");
+                const msg = missing.length > 0
+                    ? `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`
+                    : "URL no válida (debe empezar con http).";
+                return Promise.resolve({ data: {}, error: { message: msg } });
+            },
+            signOut: () => Promise.resolve({ error: null }),
         }
+    };
 
-        return mock as any;
+    if (typeof window === 'undefined') {
+        console.warn(errorMessage + " Using dummy client.");
+    } else {
+        console.error(errorMessage);
     }
 
-    return createBrowserClient(url!, key!);
+    return mock as any;
+}
+
+return createBrowserClient(url!, key!);
 }
