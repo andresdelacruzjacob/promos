@@ -39,7 +39,9 @@ export function createClient() {
                         msg = `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`;
                     } else {
                         const urlStr = url || "";
-                        msg = `URL no válida. Detectado: "${urlStr.substring(0, 30)}${urlStr.length > 30 ? '...' : ''}". Debe empezar con http.`;
+                        const start = urlStr.substring(0, 15);
+                        const end = urlStr.substring(urlStr.length - 10);
+                        msg = `URL no válida. Detectado: "${start}...${end}". Debe empezar con http y ser la nueva de Supabase.`;
                     }
                     return Promise.resolve({ data: {}, error: { message: msg } });
                 },
