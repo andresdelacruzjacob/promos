@@ -13,9 +13,8 @@ export function createClient() {
     const isInvalid = !isValidUrl || !key || url === 'undefined' || key === 'undefined';
 
     if (isInvalid) {
-        const errorMessage = `Invalid or missing Supabase configuration. URL: ${url}. Check Vercel Environment Variables.`;
+        const errorMessage = `Supabase configuration invalid. URL: ${url}.`;
 
-        // Always provide a mock to prevent crashes, both in build and browser
         const mock = {
             from: () => ({
                 select: () => ({
@@ -25,28 +24,31 @@ export function createClient() {
                 }),
                 delete: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }),
             }),
-            signInWithPassword: () => {
-                let missing = [];
-                if (!url) missing.push("URL");
-                if (!key) missing.push("Anon Key");
-                if (url === 'undefined') missing.push("URL (es 'undefined')");
-                const msg = missing.length > 0
-                    ? `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`
-                    : "URL no válida (debe empezar con http).";
-                return Promise.resolve({ data: {}, error: { message: msg } });
-            },
-            signOut: () => Promise.resolve({ error: null }),
-        }
-    };
+            auth: {
+                getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+                onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+                signInWithPassword: () => {
+                    let missing = [];
+                    if (!url) missing.push("URL");
+                    if (!key) missing.push("Anon Key");
+                    if (url === 'undefined') missing.push("URL (es 'undefined')");
+                    const msg = missing.length > 0
+                        ? `Faltan variables en Vercel: ${missing.join(", ")}. Asegúrate de hacer Redeploy.`
+                        : "URL no válida (debe empezar con http).";
+                    return Promise.resolve({ data: {}, error: { message: msg } });
+                },
+                signOut: () => Promise.resolve({ error: null }),
+            }
+        };
 
-    if (typeof window === 'undefined') {
-        console.warn(errorMessage + " Using dummy client.");
-    } else {
-        console.error(errorMessage);
+        if (typeof window === 'undefined') {
+            console.warn(errorMessage + " Using dummy client.");
+        } else {
+            console.error(errorMessage);
+        }
+
+        return mock as any;
     }
 
-    return mock as any;
-}
-
-return createBrowserClient(url!, key!);
+    return createBrowserClient(url!, key!);
 }
