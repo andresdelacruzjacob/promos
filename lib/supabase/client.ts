@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
+// Forcing new build to refresh env variables
 
 export function createClient() {
     let url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
