@@ -47,7 +47,7 @@ export default function GeneratorPage() {
     const iva = includeIva ? subtotal * 0.16 : 0;
     const total = subtotal + iva + shipping;
 
-    const generatePDF = async () => {
+    const generatePDF = async (action: "download" | "share" = "download") => {
         const doc = new jsPDF();
 
         // Configuration
@@ -137,26 +137,57 @@ export default function GeneratorPage() {
         doc.setTextColor(150);
         doc.text("Gracias por su preferencia.", 105, 280, { align: "center" });
 
-        doc.save(`${docType.replace(" ", "_")}_${clientName || "cliente"}.pdf`);
+        const fileName = `${docType.replace(" ", "_")}_${clientName || "cliente"}.pdf`;
+
+        if (action === "share" && navigator.share) {
+            const blob = doc.output("blob");
+            const file = new File([blob], fileName, { type: "application/pdf" });
+
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: docType,
+                    text: `Hola ${clientName}, adjunto envío su ${docType.toLowerCase()}.`,
+                });
+            } catch (error) {
+                console.error("Error sharing", error);
+                doc.save(fileName); // Fallback to download
+            }
+        } else {
+            doc.save(fileName);
+        }
     };
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             {/* Header Toolbar */}
-            <div className="sticky top-0 z-50 flex items-center h-16 bg-white border-b px-4 gap-4 justify-between">
-                <div className="flex items-center gap-4">
-                    <Link href="/admin">
+            <div className="sticky top-0 z-50 flex items-center h-16 bg-white border-b px-4 gap-2 justify-between">
+                <div className="flex items-center gap-2">
+                    <Link href="/admin/dashboard">
                         <Button variant="ghost" size="icon">
                             <ArrowLeft className="h-5 w-5" />
                         </Button>
                     </Link>
-                    <span className="font-bold text-lg hidden md:block">Generador de Documentos</span>
+                    <span className="font-bold text-lg hidden sm:block">Generador</span>
                 </div>
-                <Button onClick={generatePDF} className="bg-orange-600 hover:bg-orange-700">
-                    <Download className="h-4 w-4 mr-2" />
-                    Generar PDF
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={() => generatePDF("share")}
+                        variant="outline"
+                        className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                    >
+                        <Plus className="h-4 w-4 sm:mr-2 rotate-45" />
+                        <span className="hidden sm:inline">Compartir</span>
+                        <span className="sm:hidden text-xs">Enviar</span>
+                    </Button>
+                    <Button onClick={() => generatePDF("download")} className="bg-orange-600 hover:bg-orange-700">
+                        <Download className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Descargar PDF</span>
+                        <span className="sm:hidden text-xs">PDF</span>
+                    </Button>
+                </div>
             </div>
+
 
             <main className="container max-w-4xl mx-auto py-6 px-4 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
