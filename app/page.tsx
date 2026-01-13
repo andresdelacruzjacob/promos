@@ -46,69 +46,19 @@ export default function Home() {
                         selectedCategory={selectedCategory}
                         onSelectCategory={setSelectedCategory}
                     />
-                    <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className={cn("h-8 w-8", viewMode === "grid" ? "bg-white shadow-sm" : "text-slate-400")}
-                            onClick={() => setViewMode("grid")}
-                        >
-                            <LayoutGrid className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className={cn("h-8 w-8", viewMode === "list" ? "bg-white shadow-sm" : "text-slate-400")}
-                            onClick={() => setViewMode("list")}
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
-                    </div>
                 </div>
 
                 {loading ? (
-                    <div className={cn(
-                        "gap-4 px-4 md:px-0",
-                        viewMode === "grid"
-                            ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
-                            : "flex flex-col space-y-4"
-                    )}>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 px-4 md:px-0">
                         {/* Skeletons */}
                         {[...Array(6)].map((_, i) => (
-                            <div key={i} className={cn(
-                                "bg-slate-200 animate-pulse rounded-xl",
-                                viewMode === "grid" ? "h-64" : "h-32"
-                            )} />
+                            <div key={i} className="bg-slate-200 animate-pulse rounded-xl h-64" />
                         ))}
                     </div>
                 ) : products.length > 0 ? (
-                    <div className={cn(
-                        "gap-4 px-4 md:px-0",
-                        viewMode === "grid"
-                            ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
-                            : "flex flex-col space-y-4"
-                    )}>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 px-4 md:px-0">
                         {products.map((product) => (
-                            viewMode === "grid" ? (
-                                <ProductCard key={product.id} product={product} />
-                            ) : (
-                                // List View Card
-                                <div key={product.id} className="flex gap-4 p-4 bg-white rounded-xl border shadow-sm items-center">
-                                    <div className="h-20 w-20 flex-shrink-0 bg-slate-100 rounded-md overflow-hidden">
-                                        {product.image_url && <img src={product.image_url} className="h-full w-full object-cover" alt="" />}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-slate-900 truncate">{product.name}</h3>
-                                        <p className="text-sm text-slate-500">
-                                            {Array.isArray(product.category) ? product.category.join(", ") : product.category}
-                                        </p>
-                                        <span className="font-bold text-orange-600">${product.price}</span>
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        <ProductCard key={product.id} product={product} />
-                                    </div>
-                                </div>
-                            )
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 ) : (
