@@ -25,7 +25,7 @@ export default function CartPage() {
         setLoading(true);
 
         // Construct WhatsApp Message
-        let message = `*Nuevo Pedido - AutoPartesPro*\n\n`;
+        let message = `*Nuevo Pedido*\n\n`;
         message += `*Cliente:* ${name}\n`;
         message += `*Dirección:* ${address}, ${city}\n\n`;
         message += `*Pedido:*\n`;
