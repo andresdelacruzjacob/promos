@@ -43,7 +43,7 @@ export default function CartPage() {
         // Usually the client wants to send TO the business. 
         // I will stick to a generic number or ask the user later. For now, I'll use a placeholder.
         // Ideally this comes from config.
-        const phoneNumber = "5212221234567"; // Example Puebla number
+        const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "522226966779";
 
         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
 
