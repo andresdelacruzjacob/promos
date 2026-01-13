@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Trash2, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 const SHIPPING_COST = 250;
 
 export default function CartPage() {
+    const router = useRouter();
     const { items, removeItem, updateQuantity, total, clearCart } = useCart();
     const [city, setCity] = useState("Puebla");
     const [name, setName] = useState("");
@@ -24,34 +26,33 @@ export default function CartPage() {
     const handleCheckout = () => {
         setLoading(true);
 
-        // Construct WhatsApp Message
-        let message = `*Nuevo Pedido*\n\n`;
-        message += `*Cliente:* ${name}\n`;
-        message += `*Dirección:* ${address}, ${city}\n\n`;
-        message += `*Pedido:*\n`;
+        const message = `*Nuevo Pedido*\n\n` +
+            `*Cliente:* ${name}\n` +
+            `*Dirección:* ${address}, ${city}\n\n` +
+            `*Pedido:*\n` +
+            items.map(item => `- ${item.quantity}x ${item.name} ($${item.price})`).join('\n') +
+            `\n\n*Subtotal:* $${total.toFixed(2)}` +
+            `\n*Envío:* $${shipping.toFixed(2)} (${city})` +
+            `\n*TOTAL:* $${grandTotal.toFixed(2)}`;
 
-        items.forEach((item) => {
-            message += `- ${item.quantity}x ${item.name} ($${item.price})\n`;
-        });
-
-        message += `\n*Subtotal:* $${total.toFixed(2)}`;
-        message += `\n*Envío:* $${shipping.toFixed(2)} (${city})`;
-        message += `\n*TOTAL:* $${grandTotal.toFixed(2)}`;
-
-        const encodedMessage = encodeURIComponent(message);
-        // Use a placeholder phone number or let the user fill it. 
-        // Usually the client wants to send TO the business. 
-        // I will stick to a generic number or ask the user later. For now, I'll use a placeholder.
-        // Ideally this comes from config.
         const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "522226966779";
+        const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
+        // 1. Triple-lock clearing flags
+        if (typeof sessionStorage !== "undefined") {
+            sessionStorage.setItem("checkout_complete", "true");
+        }
+        localStorage.removeItem("cart");
+        clearCart();
 
-        // Ideally we should clear the cart here or after they confirm.
-        // For specific requirement "que se cobre $250... y el cliente pueda realizar pedido", 
-        // sending the message is the "realizar pedido".
-        // clearCart(); // Optional: Clear after redirect
-        setLoading(false);
+        // 2. Open WhatsApp (new tab)
+        window.open(url, "_blank");
+
+        // 3. NUCLEAR: Immediate hard redirect to ensure the current page state is gone
+        // We use a tiny timeout to allow the window.open to be triggered by the browser event
+        setTimeout(() => {
+            window.location.href = "/?cleared=true";
+        }, 50);
     };
 
     if (items.length === 0) {

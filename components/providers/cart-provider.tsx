@@ -26,6 +26,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     // Load from local storage on mount
     useEffect(() => {
+        // Triple-layer safety net: check session flag, URL param, or direct storage
+        const isSuccessfulCheckout =
+            (typeof window !== "undefined" && window.location.search.includes("cleared=true")) ||
+            (typeof sessionStorage !== "undefined" && sessionStorage.getItem("checkout_complete") === "true");
+
+        if (isSuccessfulCheckout) {
+            localStorage.removeItem("cart");
+            if (typeof sessionStorage !== "undefined") {
+                sessionStorage.removeItem("checkout_complete");
+            }
+            setItems([]);
+
+            // Clean up URL without reload if needed
+            if (typeof window !== "undefined" && window.location.search.includes("cleared=true")) {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, "", newUrl);
+            }
+            return;
+        }
+
         const savedCart = localStorage.getItem("cart");
         if (savedCart) {
             try {
@@ -76,7 +96,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
     };
 
-    const clearCart = () => setItems([]);
+    const clearCart = () => {
+        setItems([]);
+        localStorage.removeItem("cart");
+    };
 
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
