@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Edit, LogOut } from "lucide-react";
+import { Plus, Trash2, Edit, LogOut, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,12 @@ export default function AdminDashboard() {
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <h1 className="text-xl font-bold">Admin Panel</h1>
                     <div className="flex gap-4">
+                        <Link href="/admin/generator">
+                            <Button className="bg-orange-600 hover:bg-orange-700">
+                                <FileText className="h-4 w-4 mr-2" />
+                                Generar Nota/Cotización
+                            </Button>
+                        </Link>
                         <Link href="/">
                             <Button variant="ghost">Ver Promociones</Button>
                         </Link>
