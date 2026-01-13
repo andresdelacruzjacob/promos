@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LayoutGrid, List } from "lucide-react";
 import { Header } from "@/components/header";
 import { CategoryFilter } from "@/components/category-filter";
 import { ProductCard } from "@/components/product-card";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { getProducts } from "@/lib/products";
 import { Database } from "@/types/supabase";
-
 
 type Product = Database["public"]["Tables"]["products"]["Row"];
 
@@ -18,7 +14,6 @@ export default function Home() {
     const [selectedCategory, setSelectedCategory] = useState("Todas");
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
     useEffect(() => {
         async function fetchProducts() {
