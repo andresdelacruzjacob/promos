@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/client";
 export async function getProducts(category?: string) {
     const supabase = createClient();
 
-    let query = supabase.from("products").select("*").order("name");
+    let query = supabase.from("products").select("*").gt("stock", 0).order("name");
 
     if (category && category !== "Todas") {
         query = query.contains("category", [category]);

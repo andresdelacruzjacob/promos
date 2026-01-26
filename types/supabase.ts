@@ -44,6 +44,64 @@ export interface Database {
                     created_at?: string
                 }
             }
+            orders: {
+                Row: {
+                    id: string
+                    customer_name: string
+                    customer_address: string
+                    customer_city: string
+                    total_amount: number
+                    shipping_cost: number
+                    status: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    customer_name: string
+                    customer_address: string
+                    customer_city: string
+                    total_amount: number
+                    shipping_cost: number
+                    status?: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    customer_name?: string
+                    customer_address?: string
+                    customer_city?: string
+                    total_amount?: number
+                    shipping_cost?: number
+                    status?: string
+                    created_at?: string
+                }
+            }
+            order_items: {
+                Row: {
+                    id: string
+                    order_id: string
+                    product_id: string
+                    product_name: string
+                    quantity: number
+                    price_at_order: number
+                }
+                Insert: {
+                    id?: string
+                    order_id: string
+                    product_id: string
+                    product_name: string
+                    quantity: number
+                    price_at_order: number
+                }
+                Update: {
+                    id?: string
+                    order_id?: string
+                    product_id?: string
+                    product_name?: string
+                    quantity?: number
+                    price_at_order?: number
+                }
+            }
         }
     }
 }
