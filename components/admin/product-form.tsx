@@ -39,6 +39,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         description: "",
         image_url: "",
         is_offer: false,
+        condition: "Nuevo",
     });
 
     useEffect(() => {
@@ -51,6 +52,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 description: initialData.description || "",
                 image_url: initialData.image_url || "",
                 is_offer: initialData.is_offer || false,
+                condition: initialData.condition || "Nuevo",
             });
             if (initialData.image_url) setImagePreview(initialData.image_url);
         }
@@ -120,6 +122,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
             description: formData.description,
             image_url: finalImageUrl,
             is_offer: formData.is_offer,
+            condition: formData.condition,
         };
 
         let error;
@@ -220,6 +223,34 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                         />
                         <span className="text-sm font-bold text-orange-900">¿Es Oferta del Mes?</span>
                     </label>
+                </div>
+
+                <div className="space-y-3">
+                    <label className="text-sm font-medium">Condición del Producto</label>
+                    <div className="flex gap-4">
+                        <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors ${formData.condition === 'Nuevo' ? 'bg-green-50 border-green-200 text-green-700 font-bold' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                            <input
+                                type="radio"
+                                className="hidden"
+                                name="condition"
+                                value="Nuevo"
+                                checked={formData.condition === 'Nuevo'}
+                                onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                            />
+                            Nuevo
+                        </label>
+                        <label className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors ${formData.condition === 'Semi-nuevo' ? 'bg-slate-100 border-slate-300 text-slate-900 font-bold' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                            <input
+                                type="radio"
+                                className="hidden"
+                                name="condition"
+                                value="Semi-nuevo"
+                                checked={formData.condition === 'Semi-nuevo'}
+                                onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                            />
+                            Semi-nuevo
+                        </label>
+                    </div>
                 </div>
 
                 <div className="space-y-2">

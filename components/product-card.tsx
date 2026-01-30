@@ -75,6 +75,12 @@ export function ProductCard({ product }: ProductCardProps) {
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">
                             {Array.isArray(product.category) ? product.category.join(", ") : product.category}
                         </p>
+                        <div className={cn(
+                            "text-[10px] font-black uppercase tracking-tight",
+                            product.condition === "Nuevo" ? "text-green-600" : "text-slate-500"
+                        )}>
+                            {product.condition}
+                        </div>
                         <h3 className="line-clamp-2 text-base font-bold text-slate-900 group-hover:text-orange-600 transition-colors leading-tight">
                             {product.name}
                         </h3>
